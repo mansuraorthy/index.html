@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beverage Finance Dashboard – Bangladesh</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#1a1d21;--mu:#6b7280;--ln:#e5e7eb;--red:#e41e2b;--pos:#0f9d58;--neg:#d93025;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1114;--card:#1a1d21;--tx:#f1f3f5;--mu:#9aa1ab;--ln:#2c3036}}
+:root[data-theme="dark"]{--bg:#0f1114;--card:#1a1d21;--tx:#f1f3f5;--mu:#9aa1ab;--ln:#2c3036}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:1150px;margin:0 auto;padding:14px}
+header{background:#15171a;color:#fff;border-radius:12px;padding:16px 20px;border-bottom:4px solid var(--red)}
+h1{margin:0;font-size:18px}header p{margin:2px 0 10px;color:#aab;font-size:12px}
+.f{display:flex;gap:8px;flex-wrap:wrap}.f select{padding:6px 8px;border-radius:6px;border:1px solid #444;background:#2a2d31;color:#fff;font-size:12px}
+nav{display:flex;gap:6px;overflow-x:auto;margin:10px 0}nav button{padding:8px 12px;border:0;border-radius:8px;background:var(--card);color:var(--tx);cursor:pointer;white-space:nowrap;font-size:13px}
+nav button.on{background:var(--red);color:#fff}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+.c{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0}
+.l{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--mu)}.v{font-size:22px;font-weight:700}.d{font-size:12px;font-weight:600}
+.up{color:var(--pos)}.dn{color:var(--neg)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-bottom:10px}
+h3{margin:0 0 8px;font-size:13px}.cv{position:relative;height:250px}.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:right;padding:8px;border-bottom:1px solid var(--ln);white-space:nowrap}th{color:var(--mu);font-size:11px;text-transform:uppercase}th:first-child,td:first-child{text-align:left}
+section{display:none}section.on{display:block}footer{color:var(--mu);font-size:12px;margin:10px 2px}
+</style></head><body><div class="w">
+<header><h1>Beverage Company Finance Dashboard · Bangladesh</h1><p>FY2026 · Jan–Sep actual, Oct–Dec forecast · BDT millions · sample data</p>
+<div class="f"><select id="fd"></select><select id="fs"></select><select id="fc"></select><select id="fp"></select></div></header>
+<nav id="nav"></nav>
+<section id="s0"><div class="k" id="k0"></div><div class="g"><div class="c"><h3>Revenue: actual vs budget &amp; net profit</h3><div class="cv"><canvas id="a1"></canvas></div></div><div class="c"><h3>Where each taka of revenue goes</h3><div class="cv"><canvas id="a2"></canvas></div></div></div></section>
+<section id="s1"><div class="k" id="k1"></div><div class="g"><div class="c"><h3>Top 10 districts by revenue</h3><div class="cv"><canvas id="b1"></canvas></div></div><div class="c"><h3>Revenue by division</h3><div class="cv"><canvas id="b2"></canvas></div></div><div class="c"><h3>Channel mix</h3><div class="cv"><canvas id="b3"></canvas></div></div><div class="c"><h3>Monthly revenue</h3><div class="cv"><canvas id="b4"></canvas></div></div></div></section>
+<section id="s2"><div class="g"><div class="c"><h3>Margins by product</h3><div class="cv"><canvas id="c1"></canvas></div></div><div class="c tw"><h3>Product profitability (YTD, BDT M)</h3><table id="t2"></table></div></div></section>
+<section id="s3"><div class="g"><div class="c"><h3>COGS breakdown</h3><div class="cv"><canvas id="d1"></canvas></div></div><div class="c"><h3>Operating expenses (payroll, marketing, logistics, admin)</h3><div class="cv"><canvas id="d2"></canvas></div></div><div class="c"><h3>Cost as % of revenue</h3><div class="cv"><canvas id="d3"></canvas></div></div></div></section>
+<section id="s4"><div class="k" id="k4"></div><div class="g"><div class="c"><h3>Receivables aging</h3><div class="cv"><canvas id="e1"></canvas></div></div><div class="c"><h3>Payables aging</h3><div class="cv"><canvas id="e2"></canvas></div></div><div class="c"><h3>YTD cash flow bridge</h3><div class="cv"><canvas id="e3"></canvas></div></div><div class="c"><h3>Distribution: logistics cost per case by division (BDT)</h3><div class="cv"><canvas id="e4"></canvas></div></div></div></section>
+<section id="s5"><div class="k" id="k5"></div><div class="g"><div class="c tw"><h3>Budget vs actual (YTD)</h3><table id="t5"></table></div><div class="c"><h3>Forecast &amp; scenarios (monthly revenue)</h3><div class="cv"><canvas id="f1"></canvas></div></div></div></section>
+<footer>Illustrative sample data generated in the page (not real company results). Shape of data: Date · District · Product · Channel · Units · Revenue · COGS. Swap the generator for your real table.</footer>
+</div><script>
+const DIV={Dhaka:['Dhaka','Gazipur','Narayanganj','Narsingdi','Manikganj','Munshiganj','Kishoreganj','Tangail','Faridpur','Gopalganj','Madaripur','Rajbari','Shariatpur'],Chattogram:['Chattogram',"Cox's Bazar",'Cumilla','Feni','Noakhali','Lakshmipur','Chandpur','Brahmanbaria','Khagrachhari','Rangamati','Bandarban'],Rajshahi:['Rajshahi','Bogura','Pabna','Sirajganj','Natore','Naogaon','Chapainawabganj','Joypurhat'],Khulna:['Khulna','Jashore','Satkhira','Bagerhat','Kushtia','Chuadanga','Meherpur','Magura','Narail','Jhenaidah'],Barishal:['Barishal','Bhola','Patuakhali','Pirojpur','Jhalokati','Barguna'],Sylhet:['Sylhet','Moulvibazar','Habiganj','Sunamganj'],Rangpur:['Rangpur','Dinajpur','Kurigram','Gaibandha','Lalmonirhat','Nilphamari','Panchagarh','Thakurgaon'],Mymensingh:['Mymensingh','Jamalpur','Netrokona','Sherpur']};
+const DW={Dhaka:1.9,Chattogram:1.5,Rajshahi:.9,Khulna:.9,Barishal:.55,Sylhet:.65,Rangpur:.8,Mymensingh:.6},LG={Dhaka:3.2,Chattogram:3.8,Rajshahi:4.4,Khulna:4.6,Barishal:5.6,Sylhet:5.2,Rangpur:5.0,Mymensingh:4.5};
+const BIG={Dhaka:4,Chattogram:3,Gazipur:2,Narayanganj:2.2,Khulna:2,Rajshahi:2,Sylhet:2,Bogura:1.5,Cumilla:1.6,Rangpur:1.6,Mymensingh:1.5,Barishal:1.5};
+const P=[['Cola 500ml',25,.62,1.5,.07],['Cola 1L',45,.6,1,.05],['Orange Juice',30,.74,.6,.08],['Energy Drink',60,.5,.5,.12],['Water 1.5L',18,.58,1.2,.03]];
+const CH=[['Distributor',.4],['Retail',.3],['Supermarket',.15],['Online/Direct',.15]];
+const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],SE=[.9,.92,1,1.08,1.15,1.12,1.05,1.04,1,1,.97,.98],BN=[1.03,1.02,1.04,.99,1.01,1.05,1,1.03,1.02];
+const R=i=>{const x=Math.sin(i*12.9898)*43758.5453;return x-Math.floor(x)};
+const ROWS=[];let n=0;
+for(const dv in DIV)DIV[dv].forEach(d=>{const w=DW[dv]*(BIG[d]||1)*(.7+.6*R(++n));P.forEach((p,pi)=>CH.forEach((c,ci)=>{for(let m=0;m<9;m++){const u=36000*w*p[3]*c[1]*SE[m]*(1+.012*m)*(.9+.2*R(++n));ROWS.push({dv,d,m,pi,ci,u,rev:u*p[1]/1e6,cg:u*p[1]*p[2]/1e6})}}))});
+const $=id=>document.getElementById(id),T=()=>getComputedStyle(document.documentElement).getPropertyValue('--mu').trim()||'#888',G=()=>getComputedStyle(document.documentElement).getPropertyValue('--ln').trim()||'#ddd';
+const PAL=['#e41e2b','#64748b','#f59e0b','#0ea5e9','#10b981','#8b5cf6'];
+const fm=x=>Math.abs(x)>=1000?(x/1000).toFixed(2)+'B':x.toFixed(1)+'M',pc=x=>x.toFixed(1)+'%',sum=a=>a.reduce((s,x)=>s+x,0);
+const kp=(l,v,d,inv)=>`<div class="c"><div class="l">${l}</div><div class="v">${v}</div>${d==null?'':`<div class="d ${(d>=0)!=!!inv?'up':'dn'}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%</div>`}</div>`;
+const CHS={};
+function mk(id,type,labels,ds,o){if(CHS[id])CHS[id].destroy();const dn=type==='doughnut';CHS[id]=new Chart($(id),{type,data:{labels,datasets:ds},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:ds.length>1||dn,position:dn?'right':'top',labels:{color:T()}}},scales:dn?{}:{x:{ticks:{color:T()},grid:{display:false}},y:{ticks:{color:T()},grid:{color:G()}}}},o||{})})}
+const ds=(label,data,i,extra)=>Object.assign({label,data,backgroundColor:PAL[i],borderColor:PAL[i],borderRadius:3},extra||{});
+// filters
+const fd=$('fd'),fs=$('fs'),fc=$('fc'),fp=$('fp');
+fd.add(new Option('All divisions (8)','All'));Object.keys(DIV).forEach(x=>fd.add(new Option(x,x)));
+function fillD(){fs.innerHTML='';const all=fd.value==='All'?Object.values(DIV).flat():DIV[fd.value];fs.add(new Option(`All districts (${all.length})`,'All'));all.slice().sort().forEach(x=>fs.add(new Option(x,x)))}
+fc.add(new Option('All channels','All'));CH.forEach((c,i)=>fc.add(new Option(c[0],i)));fp.add(new Option('All products','All'));P.forEach((p,i)=>fp.add(new Option(p[0],i)));
+const TOT=sum(ROWS.map(r=>r.rev));let tab=0;
+function agg(){const rs=ROWS.filter(r=>(fd.value==='All'||r.dv===fd.value)&&(fs.value==='All'||r.d===fs.value)&&(fc.value==='All'||r.ci==fc.value)&&(fp.value==='All'||r.pi==fp.value));
+ const o={rev:0,cg:0,u:0,mo:Array(9).fill(0),mc:Array(9).fill(0),d:{},dv:{},ch:{},pr:{}};
+ rs.forEach(r=>{o.rev+=r.rev;o.cg+=r.cg;o.u+=r.u;o.mo[r.m]+=r.rev;o.mc[r.m]+=r.cg;o.d[r.d]=(o.d[r.d]||0)+r.rev;o.dv[r.dv]=(o.dv[r.dv]||0)+r.rev;o.ch[r.ci]=(o.ch[r.ci]||0)+r.rev;const p=o.pr[r.pi]||(o.pr[r.pi]={rev:0,cg:0,u:0});p.rev+=r.rev;p.cg+=r.cg;p.u+=r.u});
+ // operating model (% of revenue)
+ const OP={pay:.07,mkt:.065,log:.055,adm:.035},opx=sum(Object.values(OP));
+ o.gp=o.rev-o.cg;o.ox=o.rev*opx;o.ebitda=o.gp-o.ox;o.da=o.rev*.02;o.ni=(o.ebitda-o.da-o.rev*.01)*.725;o.OP=OP;
+ o.bud=o.mo.map((x,m)=>x*BN[m]);o.mni=o.mo.map((x,m)=>(x-o.mc[m]-x*opx-x*.03)*.725);return o}
+const tgt=a=>a>=0;
+function ex(o){ // page 0
+ const b=sum(o.bud);$('k0').innerHTML=kp('Net revenue',fm(o.rev),(o.rev/b-1)*100)+kp('Gross profit',fm(o.gp),null)+kp('Gross margin',pc(o.gp/o.rev*100),null)+kp('EBITDA',fm(o.ebitda),null)+kp('EBITDA margin',pc(o.ebitda/o.rev*100),null)+kp('Net profit',fm(o.ni),null)+kp('Cash balance',fm(TOT*.4*o.rev/TOT+o.ni),null);
+ mk('a1','bar',M.slice(0,9),[ds('Actual',o.mo.map(x=>+x.toFixed(1)),0),ds('Budget',o.bud.map(x=>+x.toFixed(1)),1),ds('Net profit',o.mni.map(x=>+x.toFixed(1)),4,{type:'line',tension:.3})]);
+ mk('a2','doughnut',['COGS','Payroll','Marketing','Logistics','Admin','D&A, interest, tax','Net profit'],[{data:[o.cg,o.rev*.07,o.rev*.065,o.rev*.055,o.rev*.035,o.rev-o.cg-o.rev*.225-o.ni,o.ni].map(x=>+x.toFixed(1)),backgroundColor:[...PAL,'#94a3b8'],borderWidth:0}])}
+function sales(o){const top=Object.entries(o.d).sort((a,b)=>b[1]-a[1]).slice(0,10),h=sum(o.mo.slice(0,8));
+ $('k1').innerHTML=kp('Total sales',fm(o.rev))+kp('Units sold',(o.u/1e6).toFixed(1)+'M')+kp('Avg price / unit','BDT '+(o.rev*1e6/o.u).toFixed(1))+kp('Sep vs Aug',fm(o.mo[8]),(o.mo[8]/o.mo[7]-1)*100)+kp('Districts active',Object.keys(o.d).length);
+ mk('b1','bar',top.map(x=>x[0]),[ds('Revenue (M)',top.map(x=>+x[1].toFixed(1)),0)],{indexAxis:'y'});
+ const dv=Object.entries(o.dv).sort((a,b)=>b[1]-a[1]);mk('b2','bar',dv.map(x=>x[0]),[ds('Revenue (M)',dv.map(x=>+x[1].toFixed(1)),1)]);
+ mk('b3','doughnut',CH.map(c=>c[0]),[{data:CH.map((c,i)=>+(o.ch[i]||0).toFixed(1)),backgroundColor:PAL,borderWidth:0}]);
+ mk('b4','line',M.slice(0,9),[ds('Revenue (M)',o.mo.map(x=>+x.toFixed(1)),0,{tension:.3,backgroundColor:'#e41e2b22',fill:true})])}
+function prod(o){const rows=P.map((p,i)=>{const x=o.pr[i]||{rev:0,cg:0,u:0},gp=x.rev-x.cg,mk_=x.rev*p[4],ds_=x.rev*.055;return{n:p[0],rev:x.rev,cg:x.cg,gp,gm:x.rev?gp/x.rev*100:0,cm:gp-mk_-ds_,cmp:x.rev?(gp-mk_-ds_)/x.rev*100:0}});
+ $('t2').innerHTML='<tr><th>Product</th><th>Revenue</th><th>COGS</th><th>Gross profit</th><th>GM %</th><th>Net contribution</th><th>NC %</th></tr>'+rows.map(r=>`<tr><td>${r.n}</td><td>${r.rev.toFixed(0)}</td><td>${r.cg.toFixed(0)}</td><td>${r.gp.toFixed(0)}</td><td>${r.gm.toFixed(1)}</td><td class="${r.cm>=0?'up':'dn'}">${r.cm.toFixed(0)}</td><td>${r.cmp.toFixed(1)}</td></tr>`).join('');
+ mk('c1','bar',rows.map(r=>r.n),[ds('Gross margin %',rows.map(r=>+r.gm.toFixed(1)),0),ds('Net contribution %',rows.map(r=>+r.cmp.toFixed(1)),1)])}
+function cost(o){mk('d1','doughnut',['Raw materials (sugar, flavour, CO₂)','Packaging (PET, cap, label)','Direct labour','Factory overhead & energy'],[{data:[.52,.28,.08,.12].map(x=>+(o.cg*x).toFixed(1)),backgroundColor:PAL,borderWidth:0}]);
+ mk('d2','doughnut',['Payroll','Marketing','Logistics','Admin'],[{data:Object.values(o.OP).map(x=>+(o.rev*x).toFixed(1)),backgroundColor:PAL,borderWidth:0}]);
+ mk('d3','line',M.slice(0,9),[ds('COGS %',o.mo.map((x,m)=>+(o.mc[m]/x*100).toFixed(1)),0,{tension:.3}),ds('Opex %',o.mo.map((x,m)=>+(22.5+Math.sin(m)*.8).toFixed(1)),1,{tension:.3})])}
+function ops(o){const lm=o.mo[8],cgm=o.mc[8],ar=lm*1.43,ap=cgm*1.2,inv=cgm*28/30*1.1,cpu=o.cg*1e6/o.u;
+ $('k4').innerHTML=kp('Receivables (AR)',fm(ar))+kp('Payables (AP)',fm(ap))+kp('Inventory',fm(inv))+kp('DSO','43 days')+kp('DPO','35 days')+kp('Inventory days','31 days')+kp('Cost / unit','BDT '+cpu.toFixed(1))+kp('Wastage','2.1%');
+ const age=(v,s)=>s.map(x=>+(v*x).toFixed(1)),B=['Current','1–30','31–60','61–90','90+'];
+ mk('e1','bar',B,[ds('AR (M)',age(ar,[.5,.22,.14,.09,.05]),0)]);mk('e2','bar',B,[ds('AP (M)',age(ap,[.52,.26,.13,.06,.03]),1)]);
+ const open=o.rev*.09,steps=[['Opening cash',open],['Collections',o.rev*.97],['Suppliers',-o.cg*.97],['Payroll',-o.rev*.07],['Mktg, logistics, admin',-o.rev*.155],['Tax & capex',-o.rev*.05]];let run=0,lo=[],cols=[];
+ steps.forEach(([l,v],i)=>{const a=run;run+=v;lo.push([Math.min(a,run),Math.max(a,run)]);cols.push(i==0?'#64748b':v>=0?'#10b981':'#e41e2b')});lo.push([0,run]);cols.push('#0ea5e9');
+ mk('e3','bar',[...steps.map(s=>s[0]),'Closing cash'],[{data:lo.map(x=>x.map(y=>+y.toFixed(1))),backgroundColor:cols,borderRadius:3}]);
+ mk('e4','bar',Object.keys(LG),[ds('BDT per case',Object.keys(LG).map(k=>LG[k]),2)])}
+function plan(o){const rows=[['Revenue',o.rev,sum(o.bud),1],['COGS',o.cg,o.cg*.985,-1],['Marketing',o.rev*.065,sum(o.bud)*.055,-1],['Payroll',o.rev*.07,sum(o.bud)*.068,-1],['Logistics',o.rev*.055,sum(o.bud)*.052,-1],['Net profit',o.ni,sum(o.bud)*.098,1]];
+ $('t5').innerHTML='<tr><th>Metric</th><th>Budget</th><th>Actual</th><th>Variance</th><th>Var %</th></tr>'+rows.map(([n,a,b,s])=>{const v=a-b;return`<tr><td>${n}</td><td>${b.toFixed(0)}</td><td>${a.toFixed(0)}</td><td class="${v*s>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(0)}</td><td class="${v*s>=0?'up':'dn'}">${(v/b*100).toFixed(1)}%</td></tr>`}).join('');
+ const base=sum(o.mo.slice(6))/3,SC=[['Base',1],['Optimistic',1.08],['Pessimistic',.88]],fc_=k=>[0,1,2].map(i=>base*Math.pow(1.015,i+1)*k*[1,.97,.98][i]);
+ $('k5').innerHTML=SC.map(([n,k])=>kp(n+' FY revenue',fm(o.rev+sum(fc_(k))),null)).join('');
+ const act=[...o.mo,null,null,null],pad=a=>[...Array(8).fill(null),o.mo[8],...a];
+ mk('f1','line',M,[ds('Actual',act.map(x=>x&&+x.toFixed(1)),1,{tension:.3}),...SC.map(([n,k],i)=>ds(n,pad(fc_(k)).map(x=>x&&+x.toFixed(1)),[0,4,2][i],{tension:.3,borderDash:[5,4],backgroundColor:'transparent'}))])}
+const PG=[ex,sales,prod,cost,ops,plan],NM=['Executive','Sales & Territory','Product Profitability','Cost Control','Operations & Working Capital','Budget & Forecast'];
+function render(){PG[tab](agg())}
+NM.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{tab=i;document.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on',j==i));document.querySelectorAll('nav button').forEach((x,j)=>x.classList.toggle('on',j==i));render()};$('nav').appendChild(b)});
+fd.onchange=()=>{fillD();render()};[fs,fc,fp].forEach(s=>s.onchange=render);
+fillD();document.querySelector('nav button').click();
+</script></body></html>
